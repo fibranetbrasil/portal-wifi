@@ -1,43 +1,75 @@
 <!DOCTYPE html>
 <html>
 <head>
-  <title>Wi-Fi Gratuito</title>
+  <title>Wi-Fi Fibranet Brasil</title>
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <style>
-    body { font-family: Arial; text-align: center; padding: 20px; background: #f4f6f9; }
-    .box { max-width: 380px; margin: auto; background: white; padding: 25px; border-radius: 12px; box-shadow: 0 4px 12px rgba(0,0,0,0.1); }
-    h2 { color: #1a73e8; }
-    iframe { width: 100%; height: 480px; border: none; margin: 15px 0; }
-    .btn { background: #1a73e8; color: white; padding: 14px 0; width: 100%; border: none; border-radius: 8px; font-size: 16px; cursor: pointer; }
-    .btn:hover { background: #1557b0; }
+    body { font-family: 'Segoe UI', Arial, sans-serif; text-align: center; padding: 20px; background: #f4f6f9; margin: 0; }
+    .box { max-width: 380px; margin: 20px auto; background: white; padding: 30px; border-radius: 16px; box-shadow: 0 6px 20px rgba(0,0,0,0.1); }
+    h2 { color: #e1306c; margin: 0 0 10px; font-size: 24px; }
+    .subtitle { color: #555; font-size: 15px; margin-bottom: 20px; }
+    iframe { width: 100%; height: 500px; border: none; margin: 20px 0; border-radius: 12px; overflow: hidden; }
+    .btn { 
+      background: linear-gradient(45deg, #405de6, #5851db, #833ab4, #c13584, #e1306c, #fd1d1d); 
+      color: white; padding: 16px 0; width: 100%; border: none; border-radius: 12px; font-size: 18px; font-weight: bold; cursor: pointer; 
+      box-shadow: 0 4px 15px rgba(225,48,108,0.3); transition: 0.3s; margin-top: 10px;
+    }
+    .btn:hover { transform: translateY(-2px); box-shadow: 0 6px 20px rgba(225,48,108,0.4); }
+    #status { display: none; color: #25d366; font-weight: bold; margin: 15px 0; font-size: 18px; }
   </style>
 </head>
 <body>
   <div class="box">
-    <h2>Bem-vindo ao Wi-Fi!</h2>
-    <p>Preencha o formulário para acessar a internet.</p>
+    <h2>Fibranet Brasil</h2>
+    <p class="subtitle">Preencha para acessar o Wi-Fi grátis!</p>
 
-    <!-- SEU GOOGLE FORM AQUI -->
-    <iframe src="https://docs.google.com/forms/d/e/1FAIpQLScu_cqOPyzkF7HzUCrtBhf51JXYDPLVyI8SzG8zO0Qft_rrZw/viewform?embedded=true" frameborder="0">
+    <!-- SUBSTITUA AQUI PELO SEU GOOGLE FORM -->
+    <iframe src="https://docs.google.com/forms/d/e/1FAIpQLScu_cqOPyzkF7HzUCrtBhf51JXYDPLVyI8SzG8zO0Qft_rrZw/viewform?embedded=true" id="formFrame" frameborder="0">
       Carregando…
     </iframe>
 
-    <!-- Botão que libera acesso -->
-    <button class="btn" onclick="liberarAcesso()">Acessar Internet</button>
+    <div id="status">Acesso liberado! Redirecionando...</div>
+    <button id="accessBtn" class="btn" style="display:none;" onclick="liberarAcesso()">
+      Acessar Internet
+    </button>
   </div>
 
   <script>
+    // Detecta quando o Google Form é enviado
+    const iframe = document.getElementById('formFrame');
+    const observer = new MutationObserver(() => {
+      const bodyText = iframe.contentDocument?.body?.innerText || '';
+      if (bodyText.includes("resposta foi registrada") || bodyText.includes("Obrigado")) {
+        document.getElementById('status').style.display = 'block';
+        document.getElementById('accessBtn').style.display = 'block';
+      }
+    });
+
+    iframe.onload = () => {
+      try { observer.observe(iframe.contentDocument.body, { childList: true, subtree: true }); }
+      catch(e) { console.log("Iframe bloqueado (normal em alguns casos)"); }
+    };
+
+    // Libera acesso e redireciona
     function liberarAcesso() {
-      // GWN.Cloud passa parâmetros na URL (gw_id, client_mac, etc.)
       const params = new URLSearchParams(window.location.search);
       const gw_url = params.get('gw_url') || 'http://1.1.1.1';
 
-      // Faz requisição ao GWN.Cloud para liberar acesso
-      fetch(gw_url + '/login?username=guest&password=guest', { mode: 'no-cors' })
-        .finally(() => {
-          // Redireciona para um site público (confirma conexão)
-          window.location.href = 'http://neverssl.com';
-        });
+      // Libera no GWN.Cloud
+      fetch(gw_url + '/login', {
+        method: 'POST',
+        mode: 'no-cors',
+        body: 'username=guest&password=guest',
+        headers: { 'Content-Type': 'application/x-www-form-urlencoded' }
+      }).catch(() => {});
+
+      // Atualiza mensagem
+      document.getElementById('status').innerHTML = 'Conectado! Indo para o Instagram...';
+
+      // REDIRECIONA PARA O INSTAGRAM DA FIBRANET
+      setTimeout(() => {
+        window.location.href = 'https://www.instagram.com/fibranetbrasil/';
+      }, 1000);
     }
   </script>
 </body>
