@@ -4,10 +4,9 @@
   <meta charset="UTF-8">
   <title>Wi-Fi Fibranet Brasil</title>
   <meta name="viewport" content="width=device-width, initial-scale=1">
-
   <style>
     body {
-      font-family: 'Segoe UI', Arial, sans-serif;
+      font-family: Arial, sans-serif;
       text-align: center;
       padding: 20px;
       background: #f4f6f9;
@@ -16,53 +15,47 @@
 
     .box {
       max-width: 380px;
-      margin: 20px auto;
+      margin: 30px auto;
       background: white;
-      padding: 30px;
-      border-radius: 16px;
-      box-shadow: 0 6px 20px rgba(0,0,0,0.1);
+      padding: 25px;
+      border-radius: 12px;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.1);
     }
 
     h2 {
       color: #e1306c;
-      margin: 0 0 10px;
-      font-size: 24px;
+      margin-bottom: 10px;
     }
 
-    .subtitle {
+    p {
       color: #555;
       font-size: 15px;
-      margin-bottom: 20px;
     }
 
     iframe {
       width: 100%;
-      height: 520px;
+      height: 480px;
       border: none;
-      margin: 20px 0;
-      border-radius: 12px;
-      overflow: hidden;
+      margin: 15px 0;
+      border-radius: 8px;
     }
 
-    .loading {
-      display: none;
-      color: #25d366;
-      font-weight: bold;
-      font-size: 18px;
-      margin: 20px 0;
-    }
-
-    .instagram-btn {
+    .btn {
       background: linear-gradient(45deg, #405de6, #5851db, #833ab4, #c13584, #e1306c, #fd1d1d);
       color: white;
-      padding: 16px;
-      border-radius: 12px;
-      text-decoration: none;
+      padding: 14px 0;
+      width: 100%;
+      border: none;
+      border-radius: 10px;
+      font-size: 16px;
+      cursor: pointer;
       font-weight: bold;
-      font-size: 18px;
-      display: inline-block;
-      margin-top: 15px;
-      box-shadow: 0 4px 15px rgba(225,48,108,0.3);
+      transition: 0.2s;
+      box-shadow: 0 3px 10px rgba(225,48,108,0.3);
+    }
+
+    .btn:hover {
+      opacity: 0.9;
     }
   </style>
 </head>
@@ -70,52 +63,24 @@
 <body>
   <div class="box">
     <h2>Fibranet Brasil</h2>
-    <p class="subtitle">Preencha para acessar o Wi-Fi grátis!</p>
+    <p>Preencha o formulário e clique no botão abaixo para acessar o Wi-Fi grátis!</p>
 
-    <!-- FORMULÁRIO GOOGLE -->
-    <iframe 
-      src="https://docs.google.com/forms/d/e/1FAIpQLScu_cqOPyzkF7HzUCrtBhf51JXYDPLVyI8SzG8zO0Qft_rrZw/viewform?embedded=true"
-      id="formFrame"
-      frameborder="0">
+    <!-- Formulário Google -->
+    <iframe src="https://docs.google.com/forms/d/e/1FAIpQLScu_cqOPyzkF7HzUCrtBhf51JXYDPLVyI8SzG8zO0Qft_rrZw/viewform?embedded=true" frameborder="0">
       Carregando…
     </iframe>
 
-    <div class="loading" id="loadingMsg">
-      Acesso liberado! Redirecionando para o Instagram...
-    </div>
+    <!-- Botão que libera acesso -->
+    <button class="btn" onclick="liberarAcesso()">Acessar Wi-Fi e seguir no Instagram</button>
   </div>
 
   <script>
-    const iframe = document.getElementById('formFrame');
-    const loadingMsg = document.getElementById('loadingMsg');
-
-    // Observa mudanças dentro do iframe para detectar envio do formulário
-    function monitorarFormulario() {
-      try {
-        const doc = iframe.contentDocument || iframe.contentWindow.document;
-        const observer = new MutationObserver(() => {
-          const texto = doc.body.innerText || "";
-          
-          if (texto.includes("resposta foi registrada") || texto.includes("Obrigado")) {
-            liberarAcesso();
-          }
-        });
-
-        observer.observe(doc.body, { childList: true, subtree: true });
-      } catch (e) {
-        console.warn("Não foi possível monitorar o iframe:", e);
-      }
-    }
-
-    // Libera o acesso no portal e redireciona
     function liberarAcesso() {
-      loadingMsg.style.display = 'block';
-
-      // Captura a URL de liberação do GWN.Cloud
       const params = new URLSearchParams(window.location.search);
       const gw_url = params.get('gw_url');
 
       if (gw_url) {
+        // Libera o acesso no portal (não retorna resposta, por isso usamos no-cors)
         fetch(`${gw_url}/login`, {
           method: 'POST',
           mode: 'no-cors',
@@ -124,14 +89,11 @@
         }).catch(() => {});
       }
 
-      // Redireciona após breve delay
+      // Redireciona após pequena espera (garante tempo do AP liberar)
       setTimeout(() => {
         window.location.href = 'https://www.instagram.com/fibranetbrasil/';
       }, 1500);
     }
-
-    // Ativa monitoramento ao carregar o iframe
-    iframe.addEventListener('load', monitorarFormulario);
   </script>
 </body>
 </html>
