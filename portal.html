@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Wi-Fi Gratuito</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <style>
+    body { font-family: Arial; text-align: center; padding: 20px; background: #f4f6f9; }
+    .box { max-width: 380px; margin: auto; background: white; padding: 25px; border-radius: 12px; box-shadow: 0 4px 12px rgba(0,0,0,0.1); }
+    h2 { color: #1a73e8; }
+    iframe { width: 100%; height: 480px; border: none; margin: 15px 0; }
+    .btn { background: #1a73e8; color: white; padding: 14px 0; width: 100%; border: none; border-radius: 8px; font-size: 16px; cursor: pointer; }
+    .btn:hover { background: #1557b0; }
+  </style>
+</head>
+<body>
+  <div class="box">
+    <h2>Bem-vindo ao Wi-Fi!</h2>
+    <p>Preencha o formulário para acessar a internet.</p>
+
+    <!-- SEU GOOGLE FORM AQUI -->
+    <iframe src="https://docs.google.com/forms/d/e/1FAIpQLScu_cqOPyzkF7HzUCrtBhf51JXYDPLVyI8SzG8zO0Qft_rrZw/viewform?embedded=true" frameborder="0">
+      Carregando…
+    </iframe>
+
+    <!-- Botão que libera acesso -->
+    <button class="btn" onclick="liberarAcesso()">Acessar Internet</button>
+  </div>
+
+  <script>
+    function liberarAcesso() {
+      // GWN.Cloud passa parâmetros na URL (gw_id, client_mac, etc.)
+      const params = new URLSearchParams(window.location.search);
+      const gw_url = params.get('gw_url') || 'http://1.1.1.1';
+
+      // Faz requisição ao GWN.Cloud para liberar acesso
+      fetch(gw_url + '/login?username=guest&password=guest', { mode: 'no-cors' })
+        .finally(() => {
+          // Redireciona para um site público (confirma conexão)
+          window.location.href = 'http://neverssl.com';
+        });
+    }
+  </script>
+</body>
+</html>
